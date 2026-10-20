@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: CV_TikTok
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: CV_TikTok/package-lock.json
+      - run: npm ci
+      # A user site (<name>.github.io) is served from the root; a project site from /<repo>/.
+      - name: Build
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO="${{ github.event.repository.name }}"
+          if [[ "$REPO" == *.github.io ]]; then
+            export BASE_PATH=/
+            export VITE_SITE_URL="https://$OWNER.github.io"
+          else
+            export BASE_PATH=/$REPO/
+            export VITE_SITE_URL="https://$OWNER.github.io/$REPO"
+          fi
+          npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: CV_TikTok/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

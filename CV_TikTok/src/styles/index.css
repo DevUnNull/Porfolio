@@ -1,0 +1,251 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* Colour tokens. The brief fixes the dark palette; light mode mirrors
+   TikTok Web's light surfaces. Components only reference these tokens. */
+:root {
+  --bg: #000000;
+  --surface: #161823;
+  --panel: #121212;
+  --fg: #ffffff;
+  --fg-2: #a1a1aa;
+  --pink: #fe2c55;
+  --cyan: #25f4ee;
+  --divider: #2f2f2f;
+  --hover: rgba(255, 255, 255, 0.06);
+  --chip: rgba(255, 255, 255, 0.12);
+  --chip-hover: rgba(255, 255, 255, 0.18);
+  --stage: #000000;
+  --sidebar-w: 240px;
+  --nav-h: 56px;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #ffffff;
+  --surface: #f1f1f2;
+  --panel: #f8f8f8;
+  --fg: #161823;
+  --fg-2: #6b6c73;
+  --divider: #e3e3e4;
+  --hover: rgba(22, 24, 35, 0.04);
+  --chip: rgba(22, 24, 35, 0.06);
+  --chip-hover: rgba(22, 24, 35, 0.1);
+  --stage: #161823;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-pink: var(--pink);
+  --color-cyan: var(--cyan);
+  --color-divider: var(--divider);
+  --color-hover: var(--hover);
+  --color-chip: var(--chip);
+  --color-chip-hover: var(--chip-hover);
+  --color-stage: var(--stage);
+  --font-sans: 'TikTok Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--pink);
+  color: #fff;
+}
+
+/* Full-height that survives mobile browser chrome. */
+.h-screen-safe {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* The vertical feed: one post per screen, snapping. */
+.feed-scroller {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+.feed-scroller::-webkit-scrollbar {
+  display: none;
+}
+.feed-item {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text on top of footage: a soft shadow keeps it readable on bright frames. */
+.on-video {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+@utility stage-desktop {
+  aspect-ratio: 9 / 16;
+  height: min(calc(100% - 32px), calc((100vw - var(--sidebar-w) - 220px) * 16 / 9));
+}
+
+.icon-on-video {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* Neutral scrim under captions (the one place a gradient is allowed). */
+.scrim-bottom {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+}
+.scrim-top {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+}
+
+@keyframes spin-disc {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-disc {
+  animation: spin-disc 6s linear infinite;
+}
+.paused .spin-disc {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 9s linear infinite;
+}
+
+@keyframes skeleton {
+  50% {
+    opacity: 0.55;
+  }
+}
+.skeleton {
+  background: var(--chip);
+  animation: skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes dot-l {
+  0%,
+  100% {
+    transform: translate(0, -50%);
+  }
+  50% {
+    transform: translate(24px, -50%) scale(0.8);
+  }
+}
+@keyframes dot-r {
+  0%,
+  100% {
+    transform: translate(0, -50%);
+  }
+  50% {
+    transform: translate(-24px, -50%) scale(1.2);
+  }
+}
+.dot-l {
+  animation: dot-l 0.9s ease-in-out infinite;
+}
+.dot-r {
+  animation: dot-r 0.9s ease-in-out infinite;
+}
+
+@keyframes hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+.hint-bounce {
+  animation: hint-bounce 1.6s ease-in-out infinite;
+}
+
+/* C# syntax colours for the code viewer (dark editor in both themes). */
+.code-view {
+  --tk-kw: #ff7ab2;
+  --tk-type: #5dd8ff;
+  --tk-str: #fc6a5d;
+  --tk-num: #d0bf69;
+  --tk-com: #7f8c98;
+  --tk-fn: #67b7a4;
+  background: #0d0e14;
+  color: #e6e6e6;
+}
+.tk-kw {
+  color: var(--tk-kw);
+}
+.tk-type {
+  color: var(--tk-type);
+}
+.tk-str {
+  color: var(--tk-str);
+}
+.tk-num {
+  color: var(--tk-num);
+}
+.tk-com {
+  color: var(--tk-com);
+  font-style: italic;
+}
+.tk-fn {
+  color: var(--tk-fn);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
